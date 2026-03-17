@@ -1,23 +1,24 @@
 import { useState } from "react";
-import { getChat, addChatMessage, getSessions, getUser } from "@/lib/store";
+import { getChat, addChatMessage, getSessions } from "@/lib/store";
+import { useAuth } from "@/contexts/AuthContext";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export default function ChatPage() {
-  const user = getUser();
+  const { profile } = useAuth();
   const sessions = getSessions();
   const [activeGroup, setActiveGroup] = useState(sessions[0]?.id || "");
   const [messages, setMessages] = useState(getChat(activeGroup));
   const [text, setText] = useState("");
 
   const handleSend = () => {
-    if (!text.trim() || !user) return;
+    if (!text.trim() || !profile) return;
     addChatMessage({
       id: `m_${Date.now()}`,
       groupId: activeGroup,
-      senderId: user.id,
-      senderName: user.name,
+      senderId: profile.id,
+      senderName: profile.name,
       text: text.trim(),
       timestamp: new Date().toISOString(),
     });
@@ -38,7 +39,6 @@ export default function ChatPage() {
       </div>
 
       <div className="flex gap-4 h-[60vh]">
-        {/* Group list */}
         <div className="w-56 shrink-0 bg-card rounded-xl card-shadow overflow-y-auto hidden md:block">
           <div className="p-3 border-b border-border">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Groups</p>
@@ -58,7 +58,6 @@ export default function ChatPage() {
           ))}
         </div>
 
-        {/* Chat area */}
         <div className="flex-1 bg-card rounded-xl card-shadow flex flex-col">
           <div className="p-4 border-b border-border">
             <h3 className="font-heading font-bold text-sm">
@@ -70,14 +69,14 @@ export default function ChatPage() {
               <p className="text-sm text-muted-foreground text-center mt-8">No messages yet. Start the conversation!</p>
             )}
             {messages.map(m => (
-              <div key={m.id} className={cn("flex", m.senderId === user?.id && "justify-end")}>
+              <div key={m.id} className={cn("flex", m.senderId === profile?.id && "justify-end")}>
                 <div className={cn(
                   "max-w-[70%] p-3 rounded-xl text-sm",
-                  m.senderId === user?.id
+                  m.senderId === profile?.id
                     ? "bg-primary text-primary-foreground rounded-br-sm"
                     : "bg-muted rounded-bl-sm"
                 )}>
-                  {m.senderId !== user?.id && (
+                  {m.senderId !== profile?.id && (
                     <p className="text-xs font-bold mb-1 opacity-70">{m.senderName}</p>
                   )}
                   <p>{m.text}</p>

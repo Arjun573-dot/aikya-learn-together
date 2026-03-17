@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUser, getSessions, addSession, joinSession, getReviews, type Session } from "@/lib/store";
+import { useAuth } from "@/contexts/AuthContext";
+import { getSessions, addSession, joinSession, getReviews, type Session } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { Plus, Video, Star, Clock, Users, BookOpen, Bot, ArrowRight } from "lucide-react";
+import { Plus, Video, Star, Clock, BookOpen, Bot, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
-function SessionCard({ session, isTeacher, onJoin }: { session: Session; isTeacher: boolean; onJoin: () => void }) {
-  const user = getUser();
-  const isMember = user ? session.members.includes(user.id) : false;
+function SessionCard({ session, isTeacher, userId, onJoin }: { session: Session; isTeacher: boolean; userId: string; onJoin: () => void }) {
+  const isMember = session.members.includes(userId);
   const isFull = session.members.length >= session.maxMembers;
 
   return (
@@ -24,7 +24,6 @@ function SessionCard({ session, isTeacher, onJoin }: { session: Session; isTeach
         </div>
       </div>
       <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-        {/* Member slots */}
         <div className="flex items-center gap-2">
           <div className="flex -space-x-2">
             {Array.from({ length: session.members.length }).map((_, i) => (
@@ -53,8 +52,7 @@ function SessionCard({ session, isTeacher, onJoin }: { session: Session; isTeach
   );
 }
 
-function CreateSessionModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
-  const user = getUser()!;
+function CreateSessionModal({ userName, userId, onClose, onCreated }: { userName: string; userId: string; onClose: () => void; onCreated: () => void }) {
   const [title, setTitle] = useState("");
   const [subject, setSubject] = useState("Programming");
   const [topic, setTopic] = useState("");
@@ -67,15 +65,11 @@ function CreateSessionModal({ onClose, onCreated }: { onClose: () => void; onCre
     if (!title || !time || !date) return;
     addSession({
       id: `s_${Date.now()}`,
-      title,
-      subject,
-      topic,
-      teacherId: user.id,
-      teacherName: user.name,
-      time,
-      date,
-      meetLink,
-      members: [user.id],
+      title, subject, topic,
+      teacherId: userId,
+      teacherName: userName,
+      time, date, meetLink,
+      members: [userId],
       maxMembers: 4,
     });
     onCreated();
@@ -100,11 +94,7 @@ function CreateSessionModal({ onClose, onCreated }: { onClose: () => void; onCre
             <div>
               <label className="block text-sm font-medium text-muted-foreground mb-1.5">Subject</label>
               <select value={subject} onChange={e => setSubject(e.target.value)} className="w-full h-11 px-4 rounded-lg border border-input bg-background focus:ring-2 focus:ring-ring outline-none">
-                <option>Programming</option>
-                <option>Science</option>
-                <option>Math</option>
-                <option>Design</option>
-                <option>Language</option>
+                <option>Programming</option><option>Science</option><option>Math</option><option>Design</option><option>Language</option>
               </select>
             </div>
             <div>
@@ -164,18 +154,18 @@ function ReviewModal({ onClose }: { onClose: () => void }) {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const user = getUser();
+  const { profile } = useAuth();
   const [sessions, setSessions] = useState(getSessions());
   const [showCreate, setShowCreate] = useState(false);
   const [showReview, setShowReview] = useState(false);
-  const isTeacher = user?.role === "teacher";
+  const isTeacher = profile?.role === "teacher";
   const reviews = getReviews();
 
   const refresh = () => setSessions(getSessions());
 
   const handleJoin = (sessionId: string) => {
-    if (user) {
-      joinSession(sessionId, user.id);
+    if (profile) {
+      joinSession(sessionId, profile.id);
       refresh();
     }
   };
@@ -200,7 +190,6 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-card p-5 rounded-xl card-shadow">
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Active Groups</p>
@@ -211,7 +200,7 @@ export default function DashboardPage() {
             {isTeacher ? "Sessions Created" : "Hours Learned"}
           </p>
           <p className="text-3xl font-heading font-bold mt-1 font-mono">
-            {isTeacher ? String(sessions.filter(s => s.teacherId === user?.id).length).padStart(2, "0") : "12.5"}
+            {isTeacher ? String(sessions.filter(s => s.teacherId === profile?.id).length).padStart(2, "0") : "12.5"}
           </p>
         </div>
         <div className="bg-card p-5 rounded-xl card-shadow">
@@ -222,7 +211,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Sessions */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-heading font-bold flex items-center gap-2">
@@ -235,13 +223,12 @@ export default function DashboardPage() {
         <div className="space-y-3">
           {sessions.map((s, i) => (
             <motion.div key={s.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-              <SessionCard session={s} isTeacher={isTeacher} onJoin={() => handleJoin(s.id)} />
+              <SessionCard session={s} isTeacher={isTeacher} userId={profile?.id || ""} onJoin={() => handleJoin(s.id)} />
             </motion.div>
           ))}
         </div>
       </div>
 
-      {/* AI Chatbot + Progress (sidebar widgets) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-primary rounded-2xl p-6 text-primary-foreground card-shadow relative overflow-hidden cursor-pointer hover:brightness-105 transition" onClick={() => navigate("/dashboard/ai")}>
           <div className="relative z-10">
@@ -267,7 +254,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {showCreate && <CreateSessionModal onClose={() => setShowCreate(false)} onCreated={refresh} />}
+      {showCreate && profile && <CreateSessionModal userName={profile.name} userId={profile.id} onClose={() => setShowCreate(false)} onCreated={refresh} />}
       {showReview && <ReviewModal onClose={() => setShowReview(false)} />}
     </div>
   );
