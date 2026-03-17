@@ -53,9 +53,6 @@ export default function LandingPage() {
               <Button variant="hero" size="lg" onClick={() => navigate("/auth")}>
                 Start Learning <ArrowRight className="w-5 h-5 ml-1" />
               </Button>
-              <Button variant="hero-outline" size="lg" onClick={() => navigate("/auth")}>
-                Become a Teacher
-              </Button>
             </div>
           </motion.div>
         </div>
