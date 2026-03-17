@@ -39,6 +39,7 @@ const App = () => {
             <Route path="/dashboard/groups" element={<DashboardRoute><GroupsPage /></DashboardRoute>} />
             <Route path="/dashboard/chat" element={<DashboardRoute><ChatPage /></DashboardRoute>} />
             <Route path="/dashboard/notes" element={<DashboardRoute><NotesPage /></DashboardRoute>} />
+            <Route path="/dashboard/ai" element={<DashboardRoute><AiChatPage /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
