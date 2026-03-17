@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import GroupsPage from "./pages/GroupsPage";
 import ChatPage from "./pages/ChatPage";
 import NotesPage from "./pages/NotesPage";
+import AiChatPage from "./pages/AiChatPage";
 import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
@@ -38,6 +39,7 @@ const App = () => {
             <Route path="/dashboard/groups" element={<DashboardRoute><GroupsPage /></DashboardRoute>} />
             <Route path="/dashboard/chat" element={<DashboardRoute><ChatPage /></DashboardRoute>} />
             <Route path="/dashboard/notes" element={<DashboardRoute><NotesPage /></DashboardRoute>} />
+            <Route path="/dashboard/ai" element={<DashboardRoute><AiChatPage /></DashboardRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

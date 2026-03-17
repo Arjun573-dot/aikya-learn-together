@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { getUser, isDarkMode, setDarkMode, logout, getNotifications, markNotificationRead, type Notification } from "@/lib/store";
-import { LayoutDashboard, Users, MessageCircle, FileText, Bell, Moon, Sun, LogOut, Menu, X } from "lucide-react";
+import { LayoutDashboard, Users, MessageCircle, FileText, Bell, Moon, Sun, LogOut, Menu, X, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -9,6 +9,7 @@ const navItems = [
   { id: "groups", label: "Groups", icon: Users, path: "/dashboard/groups" },
   { id: "chat", label: "Chat", icon: MessageCircle, path: "/dashboard/chat" },
   { id: "notes", label: "Notes", icon: FileText, path: "/dashboard/notes" },
+  { id: "ai", label: "Aikya AI", icon: Bot, path: "/dashboard/ai" },
 ];
 
 interface DashboardLayoutProps {

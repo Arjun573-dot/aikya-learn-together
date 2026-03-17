@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getUser, getSessions, addSession, joinSession, getReviews, type Session } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { Plus, Video, Star, Clock, Users, BookOpen } from "lucide-react";
+import { Plus, Video, Star, Clock, Users, BookOpen, Bot, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 function SessionCard({ session, isTeacher, onJoin }: { session: Session; isTeacher: boolean; onJoin: () => void }) {
@@ -162,6 +163,7 @@ function ReviewModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const user = getUser();
   const [sessions, setSessions] = useState(getSessions());
   const [showCreate, setShowCreate] = useState(false);
@@ -241,18 +243,13 @@ export default function DashboardPage() {
 
       {/* AI Chatbot + Progress (sidebar widgets) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-primary rounded-2xl p-6 text-primary-foreground card-shadow relative overflow-hidden">
+        <div className="lg:col-span-2 bg-primary rounded-2xl p-6 text-primary-foreground card-shadow relative overflow-hidden cursor-pointer hover:brightness-105 transition" onClick={() => navigate("/dashboard/ai")}>
           <div className="relative z-10">
-            <h3 className="text-lg font-heading font-bold mb-2">Aikya AI</h3>
-            <p className="text-primary-foreground/80 text-sm mb-4">Stuck on a problem? Ask your peer-learning assistant.</p>
-            <div className="bg-primary-foreground/10 rounded-xl p-3 mb-4 h-32 overflow-y-auto text-xs space-y-2">
-              <div className="bg-primary-foreground/20 p-2 rounded-lg w-3/4">How can I help you learn today?</div>
-            </div>
-            <input
-              type="text"
-              placeholder="Ask anything..."
-              className="w-full bg-primary-foreground/15 border border-primary-foreground/20 rounded-lg px-4 py-2.5 text-sm placeholder:text-primary-foreground/50 focus:outline-none focus:ring-2 ring-primary-foreground/30"
-            />
+            <h3 className="text-lg font-heading font-bold mb-2 flex items-center gap-2"><Bot className="w-5 h-5" /> Aikya AI</h3>
+            <p className="text-primary-foreground/80 text-sm mb-4">Stuck on a problem? Ask your AI-powered peer-learning assistant.</p>
+            <Button variant="outline" size="sm" className="bg-primary-foreground/15 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/25">
+              Open Chat <ArrowRight className="w-4 h-4 ml-1" />
+            </Button>
           </div>
           <div className="absolute -bottom-6 -right-6 w-28 h-28 bg-primary-foreground/10 rounded-full blur-2xl" />
         </div>
