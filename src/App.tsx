@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import GroupsPage from "./pages/GroupsPage";
 import ChatPage from "./pages/ChatPage";
 import NotesPage from "./pages/NotesPage";
+import AiChatPage from "./pages/AiChatPage";
 import DashboardLayout from "./components/DashboardLayout";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
