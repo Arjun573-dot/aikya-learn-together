@@ -163,6 +163,7 @@ function ReviewModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const user = getUser();
   const [sessions, setSessions] = useState(getSessions());
   const [showCreate, setShowCreate] = useState(false);
