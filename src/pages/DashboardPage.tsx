@@ -1,7 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getUser, getSessions, addSession, joinSession, getReviews, type Session } from "@/lib/store";
 import { Button } from "@/components/ui/button";
-import { Plus, Video, Star, Clock, Users, BookOpen } from "lucide-react";
+import { Plus, Video, Star, Clock, Users, BookOpen, Bot, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 function SessionCard({ session, isTeacher, onJoin }: { session: Session; isTeacher: boolean; onJoin: () => void }) {
