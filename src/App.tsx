@@ -3,8 +3,10 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/contexts/AuthContext";
 import LandingPage from "./pages/LandingPage";
 import AuthPage from "./pages/AuthPage";
+import RoleSelectPage from "./pages/RoleSelectPage";
 import DashboardPage from "./pages/DashboardPage";
 import GroupsPage from "./pages/GroupsPage";
 import ChatPage from "./pages/ChatPage";
@@ -32,16 +34,19 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/dashboard" element={<DashboardRoute><DashboardPage /></DashboardRoute>} />
-            <Route path="/dashboard/groups" element={<DashboardRoute><GroupsPage /></DashboardRoute>} />
-            <Route path="/dashboard/chat" element={<DashboardRoute><ChatPage /></DashboardRoute>} />
-            <Route path="/dashboard/notes" element={<DashboardRoute><NotesPage /></DashboardRoute>} />
-            <Route path="/dashboard/ai" element={<DashboardRoute><AiChatPage /></DashboardRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/role-select" element={<RoleSelectPage />} />
+              <Route path="/dashboard" element={<DashboardRoute><DashboardPage /></DashboardRoute>} />
+              <Route path="/dashboard/groups" element={<DashboardRoute><GroupsPage /></DashboardRoute>} />
+              <Route path="/dashboard/chat" element={<DashboardRoute><ChatPage /></DashboardRoute>} />
+              <Route path="/dashboard/notes" element={<DashboardRoute><NotesPage /></DashboardRoute>} />
+              <Route path="/dashboard/ai" element={<DashboardRoute><AiChatPage /></DashboardRoute>} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

@@ -14,13 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          avatar_url: string
+          created_at: string
+          email: string
+          id: string
+          name: string
+          role: string
+          subjects: string[]
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string
+          created_at?: string
+          email?: string
+          id: string
+          name?: string
+          role?: string
+          subjects?: string[]
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          role?: string
+          subjects?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_owner_of_profile: { Args: { profile_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

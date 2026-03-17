@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { getUser, isDarkMode, setDarkMode, logout, getNotifications, markNotificationRead, type Notification } from "@/lib/store";
+import { useAuth } from "@/contexts/AuthContext";
+import { getNotifications, markNotificationRead, type Notification } from "@/lib/store";
+import { isDarkMode, setDarkMode } from "@/lib/store";
 import { LayoutDashboard, Users, MessageCircle, FileText, Bell, Moon, Sun, LogOut, Menu, X, Bot } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -19,15 +21,19 @@ interface DashboardLayoutProps {
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const user = getUser();
+  const { user, profile, loading, signOut } = useAuth();
   const [dark, setDark] = useState(isDarkMode());
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(getNotifications());
 
   useEffect(() => {
-    if (!user) navigate("/auth");
-  }, [user, navigate]);
+    if (!loading && !user) navigate("/auth");
+    // If user is logged in but has no avatar (role not set), redirect to role selection
+    if (!loading && user && profile && !profile.avatar_url) {
+      navigate("/role-select");
+    }
+  }, [user, profile, loading, navigate]);
 
   useEffect(() => {
     setDarkMode(dark);
@@ -40,23 +46,23 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     setNotifications(getNotifications());
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
     navigate("/");
   };
 
-  if (!user) return null;
+  if (loading || !user || !profile) return null;
 
   const activeNav = navItems.find(n => location.pathname === n.path)?.id || "dashboard";
+  const displayName = profile.name || profile.email.split("@")[0];
+  const avatarUrl = profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(profile.email)}`;
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar */}
       <aside className={cn(
         "fixed h-full z-50 w-64 glass flex flex-col p-6 transition-transform duration-300 lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
@@ -105,9 +111,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </aside>
 
-      {/* Main */}
       <main className="flex-1 lg:ml-64 min-h-screen">
-        {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button className="lg:hidden" onClick={() => setSidebarOpen(true)}>
@@ -115,11 +119,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
             </button>
             <div>
               <p className="text-sm text-muted-foreground">Welcome back,</p>
-              <p className="font-heading font-bold text-sm">{user.name}</p>
+              <p className="font-heading font-bold text-sm">{displayName}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* Notifications */}
             <div className="relative">
               <button
                 onClick={() => setNotifOpen(!notifOpen)}
@@ -158,7 +161,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
               )}
             </div>
             <div className="w-9 h-9 rounded-full bg-muted border-2 border-background overflow-hidden">
-              <img src={user.avatar} alt={user.name} className="w-full h-full" />
+              <img src={avatarUrl} alt={displayName} className="w-full h-full" />
             </div>
           </div>
         </header>
